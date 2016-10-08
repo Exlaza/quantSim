@@ -1,0 +1,5 @@
+CREATE DATABASE securities_master;
+Use securities_master;
+CREATE USER 'sec_user'@'localhost' IDENTIFIED BY 'sec_1234';
+GRANT ALL PRIVILEGES ON securities_master.* 'sec_user'@'localhost';
+FLUSH PRIVILEGES;
