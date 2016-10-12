@@ -1,5 +1,5 @@
 """
-The follwoing code will use requests and beautiful
+The following code will use requests and beautiful
 soup4 to scrape wikipedia page containg the list of S&P 500
 """
 
@@ -55,3 +55,24 @@ def obtain_parse_wiki_snp500():
         tds = symbol.select('td')
         symbols.append((tds[0].select('a')[0].text, 'stock', tds[1].select('a')[0].text, tds[3].text, 'USD', now, now))
     return symbols
+
+def insert_snp500_symbols(symbols):
+    db_host = 'localhost'
+    db_user = 'sec_user'
+    db_name = 'securities_master'
+    db_pass = 'sec_1234'
+
+    con = mdb.connect(host = db_host, user = db_user, passwd = db_pass, db = db_name)
+
+    column_string = "ticker, instrument, name, sector, currency, created_date, last_updated_date"
+    insert_string = ("%s, " * 7)[:-2]
+    final_string = 'INSERT INTO symbol (%s) VALUES (%s)' % (column_string, insert_string)
+    with con:
+        cur = con.cursor()
+
+        cur.executemany(final_string, symbols)
+
+if __name__ == "__main__":
+    symbols = obtain_parse_wiki_snp500()
+    insert_snp500_symbols(symbols)
+    print("%s symbols were successfully added" % (len(symbols)))
